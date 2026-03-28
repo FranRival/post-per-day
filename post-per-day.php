@@ -69,8 +69,7 @@ function ppd_render_admin_page() {
         $data[$row->fecha] = $row->total;
     }
 
-    $labels = json_encode(array_keys($data));
-    $values = json_encode(array_values($data));
+
 
 
 
@@ -113,6 +112,12 @@ function ppd_render_admin_page() {
     $week_values = [];
     $year_values = [];
 
+
+    $labels = json_encode($labels_array);
+    $current_json = json_encode($current_values);
+    $week_json = json_encode($week_values);
+    $year_json = json_encode($year_values);
+
     $start = new DateTime($today);
     $end = new DateTime($end_next_month);
 
@@ -153,26 +158,27 @@ function ppd_render_admin_page() {
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: $labels,
-                datasets: [{
-                    label: 'Posts per day',
-                    data: $values,
-                    fill: false,
+            labels: $labels,
+                datasets: [
+                {
+                    label: 'Current',
+                    data: $current_json,
+                    borderWidth: 2,
                     tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true
-                    }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                {
+                    label: 'Last Week',
+                    data: $week_json,
+                    borderWidth: 2,
+                    tension: 0.3
+                },
+                {
+                    label: 'Last Year',
+                    data: $year_json,
+                    borderWidth: 2,
+                    tension: 0.3
                 }
+            ]
             }
         });
 
