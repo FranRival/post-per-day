@@ -1,0 +1,3 @@
+cantidad de post con similitud de textos. 
+porcentaje de nuevas y originales post
+grafica comparado con el mes pasado -crecimiento, decrecimiento - 
