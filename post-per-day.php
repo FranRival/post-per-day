@@ -1,8 +1,9 @@
 <?php
 /*
-Plugin Name: Posts por Día
-Description: Muestra cuántos posts se publican por día en el admin.
-Version: 1.02
+Plugin Name: PostPerDay
+Description: Muestra cuántos posts se publican por día en el admin. Grafica de crecimiento. 
+
+Version: 1.2
 */
 
 if (!defined('ABSPATH')) exit;
@@ -13,12 +14,31 @@ add_action('admin_menu', function() {
         'Posts per Day',
         'Posts per Day',
         'manage_options',
-        'posts-por-dia',
+        'posts-per-day',
         'ppd_render_admin_page',
         'dashicons-chart-bar',
         20
     );
 });
+
+
+//graficas y tablas
+add_action('admin_enqueue_scripts', function($hook) {
+
+    // IMPORTANTE: usa el slug de tu menú
+    if ($hook !== 'toplevel_page_posts-per-day') return;
+
+    wp_enqueue_script(
+        'chart-js',
+        'https://cdn.jsdelivr.net/npm/chart.js',
+        [],
+        null,
+        true
+    );
+});
+
+
+
 
 // Renderizar página
 function ppd_render_admin_page() {
@@ -49,11 +69,52 @@ function ppd_render_admin_page() {
         $data[$row->fecha] = $row->total;
     }
 
+    $labels = json_encode(array_keys($data));
+    $values = json_encode(array_values($data));
+
+    
     // Generar TODOS los días (aunque sean 0)
     $start = new DateTime($today);
     $end = new DateTime($end_next_month);
 
     echo '<div class="wrap">';
+    echo '<canvas id="ppdChart" height="100" style="margin-bottom:20px;"></canvas>';
+    echo "<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const canvas = document.getElementById('ppdChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: $labels,
+                datasets: [{
+                    label: 'Posts per day',
+                    data: $values,
+                    fill: false,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+    });
+    </script>"; 
     echo '<h1>Post per day (current + next month)</h1>';
 
     echo '<table class="widefat fixed striped">';
