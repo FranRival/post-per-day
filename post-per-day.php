@@ -113,15 +113,17 @@ function ppd_render_admin_page() {
     $year_values = [];
 
 
-    $labels = json_encode($labels_array);
-    $current_json = json_encode($current_values);
-    $week_json = json_encode($week_values);
-    $year_json = json_encode($year_values);
+    
 
     $start = new DateTime($today);
     $end = new DateTime($end_next_month);
 
     while ($start <= $end) {
+
+        $labels = json_encode($labels_array);
+        $current_json = json_encode($current_values);
+        $week_json = json_encode($week_values);
+        $year_json = json_encode($year_values);
 
         $date = $start->format('Y-m-d');
         $labels_array[] = $date;
