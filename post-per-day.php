@@ -45,14 +45,14 @@ function ppd_render_admin_page() {
     global $wpdb;
 
     // Fechas clave
-    $today = date('Y-m-d');
+    $today = gmdate('Y-m-d');
     $end_next_month = gmdate('Y-m-t', strtotime('+1 month'));// último día del mes actual
-    $end_next_month = date('Y-m-t', strtotime('+1 month'));
+
 
     // Query: posts desde hoy hasta fin del siguiente mes
     $results = $wpdb->get_results($wpdb->prepare("
         SELECT 
-            DATE(post_date_gmlt) as fecha,
+            DATE(post_date_gmt) as fecha,
             COUNT(*) as total
         FROM {$wpdb->posts}
         WHERE post_type = 'post'
@@ -81,7 +81,7 @@ function ppd_render_admin_page() {
         AND post_status IN ('publish','future')
         AND post_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
         AND post_date < CURDATE()
-        GROUP BY DATE(post_date)
+        GROUP BY DATE(post_date_gmt)
         ORDER BY fecha ASC
     ");
 
@@ -120,10 +120,8 @@ function ppd_render_admin_page() {
 
     while ($start <= $end) {
 
-        $labels = json_encode($labels_array);
-        $current_json = json_encode($current_values);
-        $week_json = json_encode($week_values);
-        $year_json = json_encode($year_values);
+
+
 
         $date = $start->format('Y-m-d');
         $labels_array[] = $date;
@@ -141,6 +139,10 @@ function ppd_render_admin_page() {
         $start->modify('+1 day');
     }
 
+        $labels = json_encode($labels_array);
+        $current_json = json_encode($current_values);
+        $week_json = json_encode($week_values);
+        $year_json = json_encode($year_values);
 
     
     // Generar TODOS los días (aunque sean 0)
