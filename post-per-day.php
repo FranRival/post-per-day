@@ -3,7 +3,7 @@
 Plugin Name: PostPerDay
 Description: Muestra cuántos posts se publican por día en el admin. Grafica de crecimiento. 
 
-Version: 1.2
+Version: 1.3
 */
 
 if (!defined('ABSPATH')) exit;
@@ -46,20 +46,20 @@ function ppd_render_admin_page() {
 
     // Fechas clave
     $today = date('Y-m-d');
-    $end_current_month = date('Y-m-t'); // último día del mes actual
+    $end_next_month = gmdate('Y-m-t', strtotime('+1 month'));// último día del mes actual
     $end_next_month = date('Y-m-t', strtotime('+1 month'));
 
     // Query: posts desde hoy hasta fin del siguiente mes
     $results = $wpdb->get_results($wpdb->prepare("
         SELECT 
-            DATE(post_date) as fecha,
+            DATE(post_date_gmlt) as fecha,
             COUNT(*) as total
         FROM {$wpdb->posts}
         WHERE post_type = 'post'
         AND post_status IN ('publish','future')
-        AND post_date >= %s
-        AND post_date <= %s
-        GROUP BY DATE(post_date)
+        AND post_date_gmt >= %s
+        AND post_date_gmt <= %s
+        GROUP BY DATE(post_date_gmt)
         ORDER BY fecha ASC
     ", $today, $end_next_month));
 
